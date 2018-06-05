@@ -72,8 +72,31 @@ function call(options, res, req, method){
       res.set(response.headers);
       res.send(response.body);
     });
+  }else if(method == 'put'){
+    if(req.headers['content-type'].match(/xml/gi)){
+      options.body = req.body
+      options.json = false;
+    }else if(req.headers['content-type'].match(/json/gi)){
+      options.body = req.body;
+      options.json = true;
+    }else if(req.headers['content-type'].match(/form/gi)){
+      options.body = req.body
+      options.json = false;
+    }else{
+      res.status(500).send('no content-type specified');
+    return;
+    }
+    console.log(req.body);
+    request.put(options, function(error, response){
+      if (error) { 
+        res.status(500).send(error);
+        return;
+      }
+      res.set(response.headers);
+      res.send(response.body);
+    });
   }else{
-    res.status(500).send('error');
+        res.status(500).send('error');
   }
   return;
 }
@@ -92,6 +115,14 @@ app.post('/', function (req, res) {
     return;
   }
   call(options, res, req, 'post');
+});
+
+app.put('/', function (req, res) {
+  var options = getOptions(req,res);
+  if(!options){
+    return;
+  }
+  call(options, res, req, 'put');
 });
 
 const port = process.env.PORT || 3002;
