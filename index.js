@@ -3,7 +3,6 @@ var http = require('http');
 var url = require('url');
 const request = require('request');
 var bodyParser = require('body-parser');
-require('body-parser-xml')(bodyParser);
 
 var app = express();
 //app.use(express.json());
@@ -51,7 +50,6 @@ function call(options, res, req, method){
       res.send(response.body);
     });
   }else if(method == 'post'){
-    // JSON
     if(req.headers['content-type'].match(/xml/gi)){
       options.body = req.body
       options.json = false;
@@ -65,10 +63,7 @@ function call(options, res, req, method){
       res.status(500).send('no content-type specified');
     return;
     }
-
     console.log(req.body);
-
-
     request.post(options, function(error, response){
       if (error) { 
         res.status(500).send(error);
@@ -77,9 +72,6 @@ function call(options, res, req, method){
       res.set(response.headers);
       res.send(response.body);
     });
-
-
-
   }else{
     res.status(500).send('error');
   }
